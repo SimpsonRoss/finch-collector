@@ -12,6 +12,13 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 
+import os
+
+import environ
+
+environ.Env()
+environ.Env.read_env()
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -78,8 +85,13 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'finchcollector',
+        'USER': 'thisisrosssimpson',
+        'PASSWORD': os.environ['DB_PASSWORD'],
+        'HOST': 'ep-flat-surf-68196459.us-east-1.aws.neon.tech',
+        'PORT': '5432',
     }
 }
+
 
 
 # Password validation
