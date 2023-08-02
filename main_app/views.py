@@ -1,12 +1,7 @@
-from django.shortcuts import render
-
-finches = [
-{'name': 'Peep', 'breed': 'Zebra Finch', 'description': 'Tiny and energetic, with distinctive black and white stripes', 'age': .4},
-{'name': 'Wings', 'breed': 'Bengalese Finch', 'description': 'Quiet and calm, with a striking chestnut plumage', 'age': 3},
-{'name': 'Chirpy', 'breed': 'Gouldian Finch', 'description': 'Colorful and vibrant, with a striking mix of green, yellow, and red feathers', 'age': 2},
-{'name': 'Song', 'breed': 'European Goldfinch', 'description': 'Distinguished by the red face and a melodious song', 'age': 5},
-{'name': 'Feather', 'breed': 'Star Finch', 'description': 'Small and adorable, known for their red face and green body', 'age': 4},
-]
+from django.shortcuts import render, redirect
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from .models import Finch
+from .forms import FeedingForm
 
 
 def home(request):
@@ -18,6 +13,35 @@ def about(request):
 
 
 def finches_index(request):
+    finches = Finch.objects.all()
     return render(request, 'finches/index.html', {
         'finches': finches,
     })
+
+def finches_detail(request, finch_id):
+    finch = Finch.objects.get(id=finch_id)
+    feeding_form = FeedingForm()
+    return render(request, 'finches/detail.html', {
+        'finch': finch,
+        'feeding_form': feeding_form,
+    })
+
+class FinchCreate(CreateView):
+    model = Finch
+    fields = '__all__'
+    
+class FinchUpdate(UpdateView):
+    model = Finch
+    fields = ['breed', 'description', 'age']
+
+class FinchDelete(DeleteView):
+    model = Finch
+    success_url = '/finches'
+
+def add_feeding(request, finch_id):
+    form = FeedingForm(request.POST)
+    if form.is_valid():
+        new_feeding = form.save(commit=False)
+        new_feeding.finch_id = finch_id
+        new_feeding.save()
+    return redirect('detail', finch_id=finch_id)
